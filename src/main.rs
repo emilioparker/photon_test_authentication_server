@@ -74,6 +74,14 @@ async fn handle(context: AppContext, mut req: Request<Body>) -> Result<Response<
         UserId : "Parker".to_owned()
     };
     let response = serde_json::to_vec(&player_response).unwrap();
-    Ok(Response::new(Body::from(response)))
+
+    let response = Response::builder()
+    .status(200)
+    .header("Content-Type", "application/json")
+    .body(Body::from(response))
+    .unwrap();
+
+    Ok(response)
+    // Ok(Response::new(Body::from(response)))
 }
 
