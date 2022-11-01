@@ -23,14 +23,16 @@ struct PlayerRequest {
 // Failure: { "ResultCode": 2, "Message": "Authentication failed. Wrong credentials." }
 
 #[derive(Deserialize, Serialize, Debug)]
-struct PlayerSuccessResponse {
-    ResultCode: u32,
-    UserId: String,
+struct SuccessData {
+    title : String,
+    level : u32
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-struct PlayerErrorResponse {
+struct PlayerResponse {
     ResultCode: u32,
+    UserId: String,
+    Data : SuccessData,
 }
 
 #[derive(Clone)]
@@ -93,9 +95,13 @@ async fn handle(context: AppContext, mut req: Request<Body>) -> Result<Response<
         let assigned_user_name = context.data_base.get(&user_name);
         if let Some(assigned_user_name) = assigned_user_name {
 
-            let player_response = PlayerSuccessResponse {
+            let player_response = PlayerResponse {
                 ResultCode :1,
-                UserId : assigned_user_name.to_owned()
+                UserId : assigned_user_name.to_owned(),
+                Data : SuccessData {
+                    level : 2,
+                    title : "developer".to_owned()
+                }
             };
             let response = serde_json::to_vec(&player_response).unwrap();
 
@@ -109,8 +115,10 @@ async fn handle(context: AppContext, mut req: Request<Body>) -> Result<Response<
         }
     }
 
-    let player_response = PlayerErrorResponse {
+    let player_response = PlayerResponse {
         ResultCode :2,
+        UserId : "".to_owned(),
+        Data : SuccessData { title: "_".to_owned(), level: 0 }
     };
     let response = serde_json::to_vec(&player_response).unwrap();
 
