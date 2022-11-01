@@ -13,6 +13,12 @@ use hyper::service::{make_service_fn, service_fn};
 
 
 #[derive(Deserialize, Serialize, Debug)]
+struct PlayerExtraData {
+    some_data: i32,
+    the_answer_to_life_the_universe_and_everything: String,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
 struct PlayerRequest {
 
     user: String,
@@ -74,15 +80,17 @@ async fn main() {
 
 async fn handle(context: AppContext, mut req: Request<Body>) -> Result<Response<Body>, Infallible> {
 
-    // let body = req.body_mut();
+    let body = req.body_mut();
+    let data = body::to_bytes(body).await.unwrap();
+    let data: PlayerExtraData = serde_json::from_slice(&data).unwrap();
 
     let query = req.uri().query().unwrap();
 
     let result = querystring::querify(query);
 
-    // let data = body::to_bytes(body).await.unwrap();
     // let data: PlayerRequest = serde_json::from_slice(&data).unwrap();
-    println!("got some data {:?}", result);
+    println!("query data {:?}", result);
+    println!("post data {:?}", data);
 
     let mut user_name : Option<String> = None;
     for data in result{
